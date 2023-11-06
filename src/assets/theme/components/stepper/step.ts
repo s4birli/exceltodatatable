@@ -1,0 +1,13 @@
+import pxToRem from "assets/theme/functions/pxToRem";
+
+type Types = any;
+
+const step: Types = {
+  styleOverrides: {
+    root: {
+      padding: `0 ${pxToRem(6)}`,
+    },
+  },
+};
+
+export default step;
