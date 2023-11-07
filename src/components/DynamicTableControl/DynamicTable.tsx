@@ -36,8 +36,43 @@ const DynamicTableControl = () => {
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get("id");
 
-  const initFilters = () => {
-    setFilters(defaultFilters);
+  const initFilters = async () => {
+    await axios
+      .get(`${process.env.REACT_APP_DEFAULT_API}/config/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        debugger;
+        const data = JSON.parse(response.data);
+        if (response.status === 200) {
+          setVisibleColumns(data.config.columns);
+          // setColumns(data.config.columns);
+          setFilters(data.config.filters);
+          setFirst(data.config.first);
+          setRows(data.config.rows);
+          setSortField(data.config.sortField);
+          setSortOrder(data.config.sortOrder);
+          fetchData(
+            data.config.first,
+            data.config.rows,
+            data.config.sortField,
+            data.config.sortOrder,
+            data.config.filters
+          );
+        } else {
+          setFilters(defaultFilters);
+        }
+
+        console.log(response);
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const updateData = async (rowData: any) => {
@@ -65,7 +100,7 @@ const DynamicTableControl = () => {
   };
 
   const fetchData = async (
-    page: number,
+    first: number,
     rowsCount: number,
     sortField: string,
     sortOrder: 1 | -1,
@@ -78,7 +113,7 @@ const DynamicTableControl = () => {
         {
           params: {
             id,
-            page,
+            first,
             rowsCount,
             sort: { field: sortField, order: sortOrder },
             filters: filters,
@@ -99,7 +134,6 @@ const DynamicTableControl = () => {
 
   useEffect(() => {
     if (id) {
-      fetchData(first, rows, sortField, sortOrder, filters);
       initFilters();
     }
   }, [id]);
@@ -107,19 +141,47 @@ const DynamicTableControl = () => {
   const onPage = (event: any) => {
     setFirst(event.first);
     setRows(event.rows);
-    fetchData(event.first, event.rows, sortField, sortOrder, filters);
+    setSortField(event.sortField);
+    setSortOrder(event.sortOrder);
+    setFilters(event.filters);
+    fetchData(
+      event.first,
+      event.rows,
+      event.sortField,
+      event.sortOrder,
+      event.filters
+    );
   };
 
   const onSort = (event: any) => {
+    setFirst(event.first);
+    setRows(event.rows);
     setSortField(event.sortField);
     setSortOrder(event.sortOrder);
-    fetchData(first, rows, event.sortField, event.sortOrder, filters);
+    setFilters(event.filters);
+    fetchData(
+      event.first,
+      event.rows,
+      event.sortField,
+      event.sortOrder,
+      event.filters
+    );
   };
 
   const onFilter = (event: DataTableFilterEvent) => {
     event["first"] = 0;
+    setFirst(event.first);
+    setRows(event.rows);
+    setSortField(event.sortField);
+    setSortOrder(event.sortOrder);
     setFilters(event.filters);
-    fetchData(first, rows, sortField, sortOrder, event.filters);
+    fetchData(
+      event.first,
+      event.rows,
+      event.sortField,
+      event.sortOrder,
+      event.filters
+    );
   };
 
   useEffect(() => {
@@ -177,6 +239,42 @@ const DynamicTableControl = () => {
     });
   };
 
+  const saveDataTable = async () => {
+    debugger;
+    console.log(visibleColumns);
+    console.log(columns);
+    setLoading(true);
+    const config = {
+      columns: visibleColumns,
+      filters: filters,
+      first: first,
+      rows: rows,
+      sortField: sortField,
+      sortOrder: sortOrder,
+    };
+
+    try {
+      await axios
+        .put(`${process.env.REACT_APP_DEFAULT_API}/configUpdate/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: config,
+        })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between align-items-center">
@@ -194,6 +292,17 @@ const DynamicTableControl = () => {
             <Button
               type="button"
               icon="pi pi-save"
+              severity="secondary"
+              rounded
+              label="Save"
+              data-pr-tooltip="Save"
+              onClick={saveDataTable}
+            />
+          </div>
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              icon="pi pi-file"
               severity="secondary"
               rounded
               label="Export"
