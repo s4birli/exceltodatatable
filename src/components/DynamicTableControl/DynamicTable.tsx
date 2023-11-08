@@ -37,6 +37,7 @@ const DynamicTableControl = () => {
   const id = queryParams.get("id");
 
   const initFilters = async () => {
+    debugger;
     await axios
       .get(`${process.env.REACT_APP_DEFAULT_API}/config/${id}`, {
         headers: {
@@ -44,11 +45,9 @@ const DynamicTableControl = () => {
         },
       })
       .then((response) => {
-        debugger;
         const data = JSON.parse(response.data);
         if (response.status === 200) {
           setVisibleColumns(data.config.columns);
-          // setColumns(data.config.columns);
           setFilters(data.config.filters);
           setFirst(data.config.first);
           setRows(data.config.rows);
@@ -79,7 +78,7 @@ const DynamicTableControl = () => {
     setLoading(true);
     try {
       await axios
-        .put(`${process.env.REACT_APP_DEFAULT_API}/update/${id}`, {
+        .put(`${process.env.REACT_APP_DEFAULT_API}/data/${id}`, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -106,6 +105,7 @@ const DynamicTableControl = () => {
     sortOrder: 1 | -1,
     filters: any
   ) => {
+    debugger;
     setLoading(true);
     try {
       const response = await axios.get(
@@ -185,6 +185,7 @@ const DynamicTableControl = () => {
   };
 
   useEffect(() => {
+    debugger;
     const visibleAndColumnHeaders = headers.map((header) => ({
       id: header.id,
       name: header.name,
@@ -255,7 +256,7 @@ const DynamicTableControl = () => {
 
     try {
       await axios
-        .put(`${process.env.REACT_APP_DEFAULT_API}/configUpdate/${id}`, {
+        .put(`${process.env.REACT_APP_DEFAULT_API}/config/${id}`, {
           headers: {
             "Content-Type": "application/json",
           },

@@ -7,11 +7,10 @@ import { useEffect, useState } from "react";
 const ExcelList = () => {
   const [data, setData] = useState<any[]>([]);
   async function getData() {
-    console.log(process.env.REACT_APP_DEFAULT_API);
     await axios
-      .get(`${process.env.REACT_APP_DEFAULT_API}/excelList`)
+      .get(`${process.env.REACT_APP_DEFAULT_API}/list`)
       .then((response) => {
-        const { data } = response.data;
+        const { data } = response;
         setData(data);
       })
       .catch((error) => console.log(error));

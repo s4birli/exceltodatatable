@@ -1,3 +1,4 @@
+import axios from "axios";
 import DashboardLayout from "components/layouts/dashboardLayout";
 import { Button } from "primereact/button";
 import { Column, ColumnBodyOptions } from "primereact/column";
@@ -12,15 +13,38 @@ const ExcelList: FC<Props> = ({ ...props }) => {
   const navigate = useNavigate();
   const { list } = props;
   const ShowButtonTemplate = (rowData: any, options: ColumnBodyOptions) => {
-    const icon = "pi pi-pencil";
+    const icon = "pi pi-search-plus";
+    const deleteIcon = "pi pi-trash";
 
     return (
-      <Button
-        type="button"
-        icon={icon}
-        className="p-button-sm p-button-text"
-        onClick={() => navigate(`/applications/import-excel?id=${rowData._id}`)}
-      />
+      <>
+        <Button
+          type="button"
+          icon={icon}
+          className="p-button-sm p-button-text"
+          onClick={() =>
+            navigate(`/applications/import-excel?id=${rowData._id}`)
+          }
+        />
+        <Button
+          type="button"
+          icon={deleteIcon}
+          className="p-button-sm p-button-text"
+          onClick={async () =>
+            await axios
+              .delete(
+                `${process.env.REACT_APP_DEFAULT_API}/list/${rowData._id}`
+              )
+              .then((response) => {
+                console.log(response);
+                window.location.reload();
+              })
+              .catch((error) => {
+                console.log(error);
+              })
+          }
+        />
+      </>
     );
   };
 

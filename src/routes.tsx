@@ -33,12 +33,12 @@ const routes = [
         route: "/applications/excel-list",
         component: <ExcelList />,
       },
-      {
-        name: "Template Excel",
-        key: "template-excel",
-        route: "/applications/template",
-        component: <Excel />,
-      },
+      // {
+      //   name: "Template Excel",
+      //   key: "template-excel",
+      //   route: "/applications/template",
+      //   component: <Excel />,
+      // },
     ],
   },
 ];
